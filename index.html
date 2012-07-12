@@ -3,9 +3,24 @@
 <head>
 <style type="text/css">
 
+#chart {
+  position: relative;
+}
+
+.link {
+  fill: none;
+}
+
 .split_value circle {
   stroke: #fff;
   stroke-width: 2px;
+}
+.split_value text {
+  font-family: Helvetica;
+  font-size: 10px;
+  font-weight: bold;
+  fill: #000;
+  text-anchor: middle;
 }
 
 .split_node rect {
@@ -14,9 +29,22 @@
   stroke-width: 2px;
 }
 
-.link {
-  fill: none;
+.split_node text {
+  font-family: Helvetica;
+  font-size: 12px;
+  font-weight: bold;
+  fill: #000;
+  text-anchor: middle;
 }
+
+.leaf_node text {
+  font-family: Helvetica;
+  font-size: 12px;
+  font-weight: bold;
+  fill: #000;
+  text-anchor: middle;
+}
+
 </style>
 </head>
 <body>
@@ -24,6 +52,7 @@
 <script src="libs/d3.v2.min.js"></script>
 <script src="libs/underscore-min.js"></script>
 <script src="libs/jquery-1.7.2.min.js"></script>
+<script src="libs/jquery.sparkline.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

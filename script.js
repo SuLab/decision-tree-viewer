@@ -31,7 +31,7 @@ $(document).ready(function() {
     .attr("width", width)
     .attr("height", height)
     .append("g")
-    .attr("transform", "translate(20,20)");
+    .attr("transform", "translate(0,8)");
 
   //Deeeebugging
   var nodes = cluster.nodes(json.tree),
@@ -58,7 +58,8 @@ $(document).ready(function() {
   .attr("d", diagonal)
   .style("stroke", function(d) { return color(d.source.depth) } )
   .style("stroke-width", function(d) { return 1.3*(depth - d.source.depth+1) +"px" } );
-
+  
+  //Drawing the groups to dom
   var split_node = vis.selectAll("g.split_node")
     .data(split_nodes)
     .enter().append("g")
@@ -75,50 +76,44 @@ $(document).ready(function() {
     .attr("class", "leaf_node")
     .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
 
+  //Adding to the groups for that node type
   split_node.append("rect")
-    .transition()
-    .delay(10*depth)
-    .duration(100*depth)
+    .transition().delay(100).duration(400)
     .attr("height", "18")
     .attr("width", function(d) { return $.trim(d.name).length*9  })
     .attr("x", function(d) { return -( $.trim(d.name).length*4.5 ) } )
     .attr("y", "-2")
   split_node.append("text")
     //move it down slightly
+    .transition().delay(100).duration(400)
     .attr("dy", 12)
-    .style("font-family", "Helvetica")
-    .style("font-size", "12px")
-    .style("font-weight", "bold")
-    .style("fill", "#000")
-    .style("text-anchor", "middle")
     .text(function(d) { return d.name.toUpperCase() });
 
   split_value.append("circle")
+    .transition().delay(100).duration(400)
     .style("fill", function(d) { return color( d.depth ) })
-    .transition()
-    .delay(10*depth)
-    .duration(100*depth)
     .attr("r", "8")
   split_value.append("text")
+    .transition().delay(100).duration(400)
     //move it down slightly
     .attr("dy", 4)
     .attr("dx", 32)
-    .style("font-family", "Helvetica")
-    .style("font-size", "10px")
-    .style("font-weight", "bold")
-    .style("fill", "#000")
-    .style("text-anchor", "middle")
     .text(function(d) { return d.name.toUpperCase() });
-
 
   leaf_node.append("text")
+    .transition().delay(100).duration(400)
     //move it down slightly
     .attr("dy", 12)
-    .style("font-family", "Helvetica")
-    .style("font-size", "12px")
-    .style("font-weight", "bold")
-    .style("fill", "#000")
-    .style("text-anchor", "middle")
     .text(function(d) { return d.name.toUpperCase() });
 
+  _.each(leaf_nodes, function(d) {
+    console.log(d);
+    $("#chart").append("<div id='sprkln"+d.bin_size+""+d.errors+"' style='display:none;position:absolute;top:"+(d.y+10)+"px;left:"+(d.x +  $.trim(d.name).length*4.5   )+"px'></div>");
+    $("#sprkln"+d.bin_size+""+d.errors).sparkline([d.bin_size,d.errors], {
+      type: 'pie',
+      width: '12',
+      height: '12',
+      sliceColors: ['#1FA13A','#D44413']
+      }).fadeIn(1200);
+    })
 })
