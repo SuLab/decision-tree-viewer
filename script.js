@@ -7,7 +7,7 @@ function kind(kind_text) {
       return 0;
     case "split_value":
       return 1;
-    case "split_node":
+    case "leaf_node":
       return 2;
     default:
       return 3;
@@ -19,14 +19,13 @@ function kind(kind_text) {
 $(document).ready(function() {
   var green = "#1FA13A",
   orange = "#D44413",
-  width = 900,
-  height = 800,
+  width = 400,
+  height = 400,
   depth = json.max_depth-1;
 
   var cluster = d3.layout.tree()
-    .size([width-40, height-40]);
-
-  var diagonal = d3.svg.diagonal();
+    .size([width-40, height-40]),
+  diagonal = d3.svg.diagonal();
 
   var vis = d3.select("#chart").append("svg")
     .attr("width", width)
@@ -35,12 +34,21 @@ $(document).ready(function() {
     .attr("transform", "translate(20,20)");
 
   //Deeeebugging
-  var nodes = cluster.nodes(json.tree);
-  console.log(nodes);
-  var links = cluster.links(nodes);
-  console.log(links);
-  var color = d3.scale.linear().domain([0, depth]).range([orange, green]);
-
+  var nodes = cluster.nodes(json.tree),
+      links = cluster.links(nodes),
+      color = d3.scale.linear().domain([0, depth]).range([orange, green]),
+  //Breaking out node types, uglyyyy
+      split_nodes = [], split_values = [], leaf_nodes = [];
+  _.each(nodes, function(node) {
+    if( kind(node.kind) == 0) {
+      split_nodes.push(node);
+    } else if ( kind(node.kind) == 1 ) {
+      split_values.push(node);
+    } else if ( kind(node.kind) == 2 || kind(node.kind) == 3 ) {
+      leaf_nodes.push(node);
+    }
+  })
+  console.log(leaf_nodes);
   //Draw the links first so they're behind the nodes
   var link = vis.selectAll("path.link")
   .data(links)
@@ -51,28 +59,66 @@ $(document).ready(function() {
   .style("stroke", function(d) { return color(d.source.depth) } )
   .style("stroke-width", function(d) { return 1.3*(depth - d.source.depth+1) +"px" } );
 
-  var node = vis.selectAll("g.node")
-    .data(nodes)
+  var split_node = vis.selectAll("g.split_node")
+    .data(split_nodes)
     .enter().append("g")
-    .attr("class", "node")
+    .attr("class", "split_node")
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+  var split_value = vis.selectAll("g.split_value")
+    .data(split_values)
+    .enter().append("g")
+    .attr("class", "split_value")
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+  var leaf_node = vis.selectAll("g.leaf_node")
+    .data(leaf_nodes)
+    .enter().append("g")
+    .attr("class", "leaf_node")
     .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
 
-  node.append("ellipse")
-    //.style("fill", function(d) { return color( d.depth ) } )
-    .style("fill", "steelblue" )
+  split_node.append("rect")
     .transition()
     .delay(10*depth)
     .duration(100*depth)
-    .attr("ry", function(d) { return 12 } )
-    .attr("rx", function(d) { return (($.trim(d.name).length * 2.6) < 14 ? 14 : ($.trim(d.name).length * 2.6) ) });
-
-  node.append("text")
-    //this is way off, fiugre out what values are going to get returned
-    .attr("dx", function(d) { return -($.trim(d.name).length)*2.6  })
-    //move it down slightly to center in circle
-    .attr("dy", 3)
+    .attr("height", "18")
+    .attr("width", function(d) { return $.trim(d.name).length*9  })
+    .attr("x", function(d) { return -( $.trim(d.name).length*4.5 ) } )
+    .attr("y", "-2")
+  split_node.append("text")
+    //move it down slightly
+    .attr("dy", 12)
     .style("font-family", "Helvetica")
+    .style("font-size", "12px")
     .style("font-weight", "bold")
     .style("fill", "#000")
-    .text(function(d) { return (kind(d.kind) + " // " + d.name) });
+    .style("text-anchor", "middle")
+    .text(function(d) { return d.name.toUpperCase() });
+
+  split_value.append("circle")
+    .style("fill", function(d) { return color( d.depth ) })
+    .transition()
+    .delay(10*depth)
+    .duration(100*depth)
+    .attr("r", "8")
+  split_value.append("text")
+    //move it down slightly
+    .attr("dy", 4)
+    .attr("dx", 32)
+    .style("font-family", "Helvetica")
+    .style("font-size", "10px")
+    .style("font-weight", "bold")
+    .style("fill", "#000")
+    .style("text-anchor", "middle")
+    .text(function(d) { return d.name.toUpperCase() });
+
+
+  leaf_node.append("text")
+    //move it down slightly
+    .attr("dy", 12)
+    .style("font-family", "Helvetica")
+    .style("font-size", "12px")
+    .style("font-weight", "bold")
+    .style("fill", "#000")
+    .style("text-anchor", "middle")
+    .text(function(d) { return d.name.toUpperCase() });
+
 })
