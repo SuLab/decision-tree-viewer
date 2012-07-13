@@ -20,7 +20,7 @@ $(document).ready(function() {
   var green = "#1FA13A",
   orange = "#D44413",
   width = 400,
-  height = 400,
+  height = 600,
   depth = json.max_depth-1;
 
   var cluster = d3.layout.tree()
@@ -100,12 +100,14 @@ $(document).ready(function() {
     .attr("dx", 32)
     .text(function(d) { return d.name.toUpperCase() });
 
+  //Left node text
   leaf_node.append("text")
     .transition().delay(100).duration(400)
     //move it down slightly
     .attr("dy", 12)
     .text(function(d) { return d.name.toUpperCase() });
 
+    //Adding the bar graphs
   _.each(leaf_nodes, function(d) {
     console.log(d);
     $("#chart").append("<div id='sprkln"+d.bin_size+""+d.errors+"' style='display:none;position:absolute;top:"+(d.y+10)+"px;left:"+(d.x +  $.trim(d.name).length*4.5   )+"px'></div>");
