@@ -19,8 +19,8 @@ function kind(kind_text) {
 $(document).ready(function() {
   var green = "#1FA13A",
   orange = "#D44413",
-  width = 400,
-  height = 600,
+  width = 800,
+  height = 400,
   depth = json.max_depth-1;
 
   var cluster = d3.layout.tree()
